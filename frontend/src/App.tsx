@@ -1,58 +1,102 @@
 import { useEffect } from 'react';
-import { ReactFlowProvider } from '@xyflow/react';
+import { ReactFlowProvider, type Node, type Edge } from '@xyflow/react';
 import AppLayout from './components/layout/AppLayout';
 import { useWorkflowStore } from './store/workflowStore';
 import { defaultNodes, defaultEdges } from './components/canvas/defaultWorkflow';
 import { workflowApi } from './api/workflowApi';
+import type { WorkflowNodeData } from './types/workflow';
 
 function App() {
   const { setNodes, setEdges, setWorkflowId, setWorkflowName } = useWorkflowStore();
 
   useEffect(() => {
-    // Try to load the most recent workflow, otherwise use defaults
-    workflowApi
-      .list()
-      .then((workflows) => {
+    // 从URL中获取工作流ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const workflowIdFromUrl = urlParams.get('workflowId');
+
+    const loadWorkflow = async () => {
+      try {
+        // 如果URL中有工作流ID，优先加载该工作流
+        if (workflowIdFromUrl) {
+          const workflow = await workflowApi.get(workflowIdFromUrl);
+          setWorkflowId(workflow.id);
+          setWorkflowName(workflow.name);
+          
+          const def = workflow.definition;
+          if (def && def.nodes) {
+            const rfNodes = def.nodes.map((n) => ({
+              id: n.id,
+              type: n.type,
+              position: n.position,
+              data: {
+                label: n.label || getDefaultLabel(n.type),
+                nodeType: n.type,
+                config: n.config || {},
+              },
+            })) as Node<WorkflowNodeData>[];
+            
+            const rfEdges = (def.edges || []).map((e) => ({
+              id: e.id,
+              source: e.source,
+              sourceHandle: e.sourceHandle,
+              target: e.target,
+              targetHandle: e.targetHandle,
+              animated: true,
+            })) as Edge[];
+            
+            setNodes(rfNodes);
+            setEdges(rfEdges);
+          }
+          return;
+        }
+
+        // 否则加载最近的工作流
+        const workflows = await workflowApi.list();
         if (workflows.length > 0) {
           const latest = workflows[0];
           setWorkflowId(latest.id);
           setWorkflowName(latest.name);
+          
           const def = latest.definition;
           if (def && def.nodes) {
-            // Map backend node format to ReactFlow node format
-            const rfNodes = def.nodes.map((n: Record<string, unknown>) => ({
-              id: n.id as string,
-              type: n.type as string,
-              position: n.position as { x: number; y: number },
+            const rfNodes = def.nodes.map((n) => ({
+              id: n.id,
+              type: n.type,
+              position: n.position,
               data: {
-                label:
-                  (n as Record<string, unknown>).label ||
-                  getDefaultLabel(n.type as string),
-                nodeType: n.type as string,
-                config: (n as Record<string, unknown>).config || {},
+                label: n.label || getDefaultLabel(n.type),
+                nodeType: n.type,
+                config: n.config || {},
               },
-            }));
-            const rfEdges = (def.edges || []).map((e: Record<string, unknown>) => ({
-              id: e.id as string,
-              source: e.source as string,
-              sourceHandle: e.sourceHandle as string | undefined,
-              target: e.target as string,
-              targetHandle: e.targetHandle as string | undefined,
+            })) as Node<WorkflowNodeData>[];
+            
+            const rfEdges = (def.edges || []).map((e) => ({
+              id: e.id,
+              source: e.source,
+              sourceHandle: e.sourceHandle,
+              target: e.target,
+              targetHandle: e.targetHandle,
               animated: true,
-            }));
+            })) as Edge[];
+            
             setNodes(rfNodes);
             setEdges(rfEdges);
           }
+          
+          // 更新URL（不添加历史记录）
+          window.history.replaceState(null, '', `?workflowId=${latest.id}`);
         } else {
           setNodes(defaultNodes);
           setEdges(defaultEdges);
         }
-      })
-      .catch(() => {
+      } catch {
         // Backend not available, use defaults
         setNodes(defaultNodes);
         setEdges(defaultEdges);
-      });
+      }
+    };
+
+    loadWorkflow();
   }, [setNodes, setEdges, setWorkflowId, setWorkflowName]);
 
   return (

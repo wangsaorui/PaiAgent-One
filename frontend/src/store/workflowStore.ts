@@ -9,7 +9,7 @@ import {
   applyEdgeChanges,
   addEdge,
 } from '@xyflow/react';
-import type { WorkflowNodeData, NodeConfig } from '../types/workflow';
+import type { WorkflowNodeData, NodeConfig, WorkflowNode, WorkflowEdge } from '../types/workflow';
 
 interface WorkflowState {
   workflowId: string | null;
@@ -27,6 +27,7 @@ interface WorkflowState {
   setSelectedNodeId: (id: string | null) => void;
   addNode: (node: Node<WorkflowNodeData>) => void;
   updateNodeConfig: (nodeId: string, config: Partial<NodeConfig>) => void;
+  loadWorkflow: (id: string, name: string, workflowNodes: WorkflowNode[], workflowEdges: WorkflowEdge[]) => void;
 }
 
 export const useWorkflowStore = create<WorkflowState>((set, get) => ({
@@ -60,4 +61,33 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
           : n
       ),
     }),
+
+  loadWorkflow: (id, name, workflowNodes, workflowEdges) => {
+    // 将工作流节点转换为ReactFlow节点格式
+    const rfNodes = workflowNodes.map((n) => ({
+      id: n.id,
+      type: n.type,
+      position: n.position,
+      data: n.data,
+    })) as Node<WorkflowNodeData>[];
+
+    // 将工作流边转换为ReactFlow边格式
+    const rfEdges = workflowEdges.map((e) => ({
+      id: e.id,
+      source: e.source,
+      sourceHandle: e.sourceHandle,
+      target: e.target,
+      targetHandle: e.targetHandle,
+      animated: true,
+    })) as Edge[];
+
+    // 更新store状态
+    set({
+      workflowId: id,
+      workflowName: name,
+      nodes: rfNodes,
+      edges: rfEdges,
+      selectedNodeId: null,
+    });
+  },
 }));

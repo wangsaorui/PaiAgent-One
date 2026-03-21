@@ -37,7 +37,29 @@ export const defaultNodes: Node<WorkflowNodeData>[] = [
     id: 'node-4',
     type: 'end-node',
     position: { x: 300, y: 580 },
-    data: { label: '结束', nodeType: 'end-node', config: {} },
+    data: { 
+      label: '结束', 
+      nodeType: 'end-node', 
+      config: {
+        outputParams: [
+          {
+            name: 'podcast_content',
+            type: 'reference',
+            value: '',
+            referenceNodeId: 'node-2',
+            referenceOutputKey: 'output'
+          },
+          {
+            name: 'audio_file',
+            type: 'reference',
+            value: '',
+            referenceNodeId: 'node-3',
+            referenceOutputKey: 'audio_url'
+          }
+        ],
+        responseTemplate: '播客内容：{{podcast_content}}\n\n音频文件：{{audio_file}}'
+      } 
+    },
   },
 ];
 

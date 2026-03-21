@@ -1,5 +1,7 @@
 import NodePaletteItem from './NodePaletteItem';
 import LLMConfigPanel from '../panels/LLMConfigPanel';
+import UserInputConfigPanel from '../panels/UserInputConfigPanel';
+import EndNodeConfigPanel from '../panels/EndNodeConfigPanel';
 import { useWorkflowStore } from '../../store/workflowStore';
 
 export default function NodeSidebar() {
@@ -7,11 +9,13 @@ export default function NodeSidebar() {
   const nodes = useWorkflowStore((s) => s.nodes);
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const showLLMConfig = selectedNode?.type === 'llm-node';
+  const showUserInputConfig = selectedNode?.type === 'user-input';
+  const showEndNodeConfig = selectedNode?.type === 'end-node';
 
   return (
     <div
       style={{
-        width: 240,
+        width: 320,
         height: '100%',
         borderRight: '1px solid #e5e7eb',
         background: '#fafafa',
@@ -32,7 +36,20 @@ export default function NodeSidebar() {
           color="#f59e0b"
         />
       </div>
-      {showLLMConfig && <LLMConfigPanel />}
+      
+      {/* 配置面板区域 - 添加滚动功能 */}
+      <div 
+        style={{ 
+          flex: 1, 
+          overflow: 'auto',
+          overflowX: 'hidden',
+          overflowY: 'auto',
+        }}
+      >
+        {showLLMConfig && <LLMConfigPanel />}
+        {showUserInputConfig && <UserInputConfigPanel />}
+        {showEndNodeConfig && <EndNodeConfigPanel />}
+      </div>
     </div>
   );
 }

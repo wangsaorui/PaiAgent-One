@@ -16,11 +16,15 @@ export default function LLMConfigPanel() {
   };
 
   return (
-    <div style={{ padding: 16, borderTop: '1px solid #e5e7eb' }}>
+    <div style={{ 
+      padding: 16, 
+      borderTop: '1px solid #e5e7eb',
+      backgroundColor: 'white',
+    }}>
       <h4 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#374151' }}>
         大模型配置
       </h4>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <label style={labelStyle}>
           <span>Provider</span>
           <select
@@ -48,8 +52,9 @@ export default function LLMConfigPanel() {
           <textarea
             value={config.systemPrompt || ''}
             onChange={(e) => handleChange('systemPrompt', e.target.value)}
-            rows={3}
-            style={{ ...inputStyle, resize: 'vertical' }}
+            rows={4}
+            style={{ ...inputStyle, resize: 'vertical', minHeight: 80 }}
+            placeholder="输入系统提示词..."
           />
         </label>
         <label style={labelStyle}>
@@ -61,7 +66,7 @@ export default function LLMConfigPanel() {
             step="0.1"
             value={config.temperature ?? 0.7}
             onChange={(e) => handleChange('temperature', parseFloat(e.target.value))}
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginTop: 4 }}
           />
         </label>
       </div>
@@ -72,15 +77,17 @@ export default function LLMConfigPanel() {
 const labelStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 4,
+  gap: 6,
   fontSize: 12,
   color: '#6b7280',
 };
 
 const inputStyle: React.CSSProperties = {
-  padding: '6px 8px',
+  padding: '8px 10px',
   border: '1px solid #d1d5db',
   borderRadius: 6,
-  fontSize: 12,
+  fontSize: 13,
   outline: 'none',
+  width: '100%',
+  boxSizing: 'border-box',
 };
