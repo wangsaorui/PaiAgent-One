@@ -9,7 +9,7 @@ export function useSSE() {
     (executionId: string) => {
       const es = new EventSource(`/api/executions/${executionId}/events`);
 
-      const handleEvent = (e: MessageEvent) => {
+      const handleMessage = (e: MessageEvent) => {
         const data: ExecutionEvent = JSON.parse(e.data);
 
         switch (data.type) {
@@ -86,13 +86,18 @@ export function useSSE() {
         message: '开始执行工作流',
       });
 
-      es.addEventListener('NODE_STARTED', handleEvent);
-      es.addEventListener('NODE_COMPLETED', handleEvent);
-      es.addEventListener('NODE_FAILED', handleEvent);
-      es.addEventListener('EXECUTION_COMPLETED', handleEvent);
-      es.addEventListener('EXECUTION_FAILED', handleEvent);
+      // 监听所有消息事件，通过 type 字段分发处理
+      es.onmessage = handleMessage;
 
-      es.onerror = () => {
+      es.onopen = () => {
+        addLog({
+          type: 'info',
+          message: 'SSE 连接已建立',
+        });
+      };
+
+      es.onerror = (e) => {
+        console.error('SSE error:', e);
         addLog({
           type: 'error',
           message: '与服务器连接中断',

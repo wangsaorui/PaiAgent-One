@@ -16,9 +16,19 @@ public class ExecutionEventEmitter {
 
     public void register(String executionId, SseEmitter emitter) {
         emitters.put(executionId, emitter);
-        emitter.onCompletion(() -> emitters.remove(executionId));
-        emitter.onTimeout(() -> emitters.remove(executionId));
-        emitter.onError(e -> emitters.remove(executionId));
+        log.info("SSE emitter registered for execution: {}", executionId);
+        emitter.onCompletion(() -> {
+            log.info("SSE emitter completed for execution: {}", executionId);
+            emitters.remove(executionId);
+        });
+        emitter.onTimeout(() -> {
+            log.warn("SSE emitter timeout for execution: {}", executionId);
+            emitters.remove(executionId);
+        });
+        emitter.onError(e -> {
+            log.warn("SSE emitter error for execution {}: {}", executionId, e.getMessage());
+            emitters.remove(executionId);
+        });
     }
 
     public void emit(String executionId, ExecutionEventDTO event) {
@@ -26,12 +36,14 @@ public class ExecutionEventEmitter {
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .name(event.getType())
                         .data(event));
+                log.debug("Sent SSE event {} for execution {}", event.getType(), executionId);
             } catch (IOException e) {
                 log.warn("Failed to send SSE event for execution {}: {}", executionId, e.getMessage());
                 emitters.remove(executionId);
             }
+        } else {
+            log.warn("No SSE emitter found for execution {}, event {} was not sent", executionId, event.getType());
         }
     }
 

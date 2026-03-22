@@ -166,38 +166,21 @@ export default function EndNodeConfigPanel() {
                     />
                   </label>
                 ) : (
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <div style={{ flex: 1 }}>
-                      <label style={labelStyle}>
-                        <span>引用节点</span>
-                        <select
-                          value={param.referenceNodeId || ''}
-                          onChange={(e) => handleParamChange(index, 'referenceNodeId', e.target.value)}
-                          style={inputStyle}
-                        >
-                          <option value="">请选择节点</option>
-                          {referenceableNodes.map(node => (
-                            <option key={node.id} value={node.id}>
-                              {node.data.label} ({node.id})
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
-                    
-                    <div style={{ flex: 1 }}>
-                      <label style={labelStyle}>
-                        <span>输出键</span>
-                        <input
-                          type="text"
-                          value={param.referenceOutputKey || ''}
-                          onChange={(e) => handleParamChange(index, 'referenceOutputKey', e.target.value)}
-                          placeholder="例如: output"
-                          style={inputStyle}
-                        />
-                      </label>
-                    </div>
-                  </div>
+                  <label style={labelStyle}>
+                    <span>引用节点</span>
+                    <select
+                      value={param.referenceNodeId || ''}
+                      onChange={(e) => handleParamChange(index, 'referenceNodeId', e.target.value)}
+                      style={inputStyle}
+                    >
+                      <option value="">请选择节点</option>
+                      {referenceableNodes.map(node => (
+                        <option key={node.id} value={node.id}>
+                          {node.data.label} ({node.id})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 )}
                 
                 <button

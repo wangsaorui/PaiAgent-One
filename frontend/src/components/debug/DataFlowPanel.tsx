@@ -45,7 +45,7 @@ export default function DataFlowPanel({ nodeStatuses, nodeOrder }: DataFlowPanel
         {nodeOrder.map((node, index) => {
           const status = nodeStatuses[node.id];
           const isExpanded = expandedNode === node.id;
-          const hasData = status?.input || status?.output;
+          const hasData = Boolean(status?.input) || Boolean(status?.output);
 
           return (
             <div key={node.id}>
@@ -134,7 +134,7 @@ export default function DataFlowPanel({ nodeStatuses, nodeOrder }: DataFlowPanel
                 {/* 展开的数据详情 */}
                 {isExpanded && (
                   <div style={{ marginTop: 10 }}>
-                    {status?.input && (
+                    {Boolean(status?.input) && (
                       <div style={{ marginBottom: 8 }}>
                         <div style={{
                           fontSize: 11,
@@ -162,7 +162,7 @@ export default function DataFlowPanel({ nodeStatuses, nodeOrder }: DataFlowPanel
                       </div>
                     )}
                     
-                    {status?.output && (
+                    {Boolean(status?.output) && (
                       <div>
                         <div style={{
                           fontSize: 11,

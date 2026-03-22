@@ -126,7 +126,7 @@ export default function ExecutionLogPanel({ logs }: ExecutionLogPanelProps) {
                     </span>
                   )}
                 </div>
-                {log.data && (
+                {Boolean(log.data) && (
                   <pre style={{
                     marginTop: 6,
                     padding: '6px 8px',

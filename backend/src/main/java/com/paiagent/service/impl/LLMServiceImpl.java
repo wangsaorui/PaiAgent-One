@@ -24,22 +24,47 @@ public class LLMServiceImpl implements LLMService {
 
     @Override
     public String chat(String provider, String model, String systemPrompt, String userMessage, double temperature) {
+        return chat(provider, model, systemPrompt, userMessage, temperature, null, null);
+    }
+
+    @Override
+    public String chat(String provider, String model, String systemPrompt, String userMessage, double temperature,
+                       String apiKeyOverride, String baseUrlOverride) {
+        // Determine API key: node config > application.yml
+        String apiKey = apiKeyOverride;
+        String baseUrl = baseUrlOverride;
+
         LLMProviderConfig.ProviderProperties props = providerConfig.getProvider(provider);
-        if (props == null) {
-            throw new RuntimeException("Unknown LLM provider: " + provider);
-        }
-
-        String apiKey = props.getApiKey();
         if (apiKey == null || apiKey.isBlank()) {
-            log.warn("API key not configured for provider [{}], returning mock response", provider);
-            return "[Mock LLM Response] 这是一段模拟的播客文稿。用户输入: " + userMessage
-                    + "\n\n大家好，欢迎收听本期AI播客！今天我们来聊聊一个非常有趣的话题。"
-                    + "在人工智能飞速发展的今天，我们每个人都在见证着技术的变革。"
-                    + "让我们一起深入探讨这个话题的方方面面吧！";
+            if (props != null) {
+                apiKey = props.getApiKey();
+            }
+        }
+        if (baseUrl == null || baseUrl.isBlank()) {
+            if (props != null) {
+                baseUrl = props.getBaseUrl();
+            }
         }
 
-        String url = props.getBaseUrl() + "/chat/completions";
-        String actualModel = (model != null && !model.isBlank()) ? model : props.getDefaultModel();
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new RuntimeException("API key not configured for provider [" + provider
+                    + "]. Please set it in the LLM node config or application.yml.");
+        }
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new RuntimeException("Base URL not configured for provider [" + provider + "].");
+        }
+
+        // Use baseUrl directly if it's already a complete API URL, otherwise append /chat/completions
+        String url = baseUrl;
+        if (!baseUrl.contains("/chat/completions")) {
+            String normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+            if (!normalizedBaseUrl.endsWith("/v1")) {
+                normalizedBaseUrl = normalizedBaseUrl + "/v1";
+            }
+            url = normalizedBaseUrl + "/chat/completions";
+        }
+        String actualModel = (model != null && !model.isBlank()) ? model
+                : (props != null ? props.getDefaultModel() : "");
 
         Map<String, Object> requestBody = Map.of(
                 "model", actualModel,
@@ -58,13 +83,30 @@ public class LLMServiceImpl implements LLMService {
             String bodyJson = objectMapper.writeValueAsString(requestBody);
             HttpEntity<String> entity = new HttpEntity<>(bodyJson, headers);
 
-            log.info("Calling LLM [{}] model [{}]", provider, actualModel);
+            log.info("=== LLM API Call ===");
+            log.info("Provider: {}", provider);
+            log.info("Model: {}", actualModel);
+            log.info("URL: {}", url);
+            log.info("Request Body: {}", bodyJson);
+
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
+            log.info("Response Status: {}", response.getStatusCode());
+            log.info("Response Body: {}", response.getBody());
+
             JsonNode root = objectMapper.readTree(response.getBody());
-            return root.path("choices").get(0).path("message").path("content").asText();
+            String content = root.path("choices").get(0).path("message").path("content").asText();
+            log.info("Extracted Content Length: {} chars", content.length());
+            return content;
+        } catch (org.springframework.web.client.HttpClientErrorException | org.springframework.web.client.HttpServerErrorException e) {
+            log.error("=== LLM API Error ===");
+            log.error("Provider: {}", provider);
+            log.error("URL: {}", url);
+            log.error("Status Code: {}", e.getStatusCode());
+            log.error("Response Body: {}", e.getResponseBodyAsString());
+            throw new RuntimeException("LLM API error [" + e.getStatusCode() + "]: " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            log.error("LLM call failed for provider [{}]: {}", provider, e.getMessage());
+            log.error("LLM call failed for provider [{}]: {}", provider, e.getMessage(), e);
             throw new RuntimeException("LLM call failed: " + e.getMessage(), e);
         }
     }

@@ -26,12 +26,22 @@ public class WorkflowEngineService {
 
     @Async("workflowExecutor")
     public void executeWorkflow(String executionId, WorkflowDefinition definition, String inputText) {
+        // Wait for SSE connection to be established
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         ExecutionContext context = new ExecutionContext();
         context.setExecutionId(executionId);
         context.setInputText(inputText);
 
+        log.info("Starting workflow execution: {}", executionId);
+
         try {
             List<NodeDefinition> sortedNodes = topologicalSort(definition);
+            log.info("Execution order: {}", sortedNodes.stream().map(n -> n.getId() + "(" + n.getType() + ")").toList());
 
             for (NodeDefinition node : sortedNodes) {
                 // Emit NODE_STARTED
@@ -151,6 +161,9 @@ public class WorkflowEngineService {
     }
 
     private NodeExecutor findExecutor(String nodeType) {
+        if (nodeType == null || nodeType.isBlank()) {
+            throw new RuntimeException("Node type is empty or null. Please check if the workflow was saved correctly.");
+        }
         return nodeExecutors.stream()
                 .filter(e -> e.supports(nodeType))
                 .findFirst()

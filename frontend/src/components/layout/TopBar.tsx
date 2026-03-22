@@ -27,7 +27,7 @@ export default function TopBar() {
       name: name,
       nodes: nodes.map((n) => ({
         id: n.id,
-        type: n.type!,
+        type: n.type || n.data?.nodeType || '',
         position: n.position,
         data: n.data,
       })),

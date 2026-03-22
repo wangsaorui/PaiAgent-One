@@ -5,10 +5,31 @@ export interface NodeConfig {
   temperature?: number;
   voice?: string;
   speed?: number;
+  // LLM specific configs
+  apiKey?: string;
+  baseUrl?: string;
+  // LLM input params (references to upstream node outputs)
+  inputParams?: InputParam[];
+  // LLM output variable definitions
+  llmOutputParams?: LLMOutputParam[];
   // EndNode specific configs
   outputParams?: OutputParam[];
   responseTemplate?: string;
   [key: string]: unknown;
+}
+
+export interface LLMOutputParam {
+  name: string;           // 变量名
+  valueType: 'string';    // 变量类型，目前仅支持 string
+  description?: string;   // 描述（可为空）
+}
+
+export interface InputParam {
+  name: string;         // 参数名称，如 "user_input"
+  type: 'input' | 'reference';
+  value: string;        // type='input' 时为手动输入值
+  referenceNodeId?: string;    // type='reference' 时引用的节点ID
+  referenceOutputKey?: string; // type='reference' 时引用的输出key
 }
 
 export interface OutputParam {

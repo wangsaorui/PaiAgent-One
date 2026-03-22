@@ -25,40 +25,22 @@ export const defaultNodes: Node<WorkflowNodeData>[] = [
   },
   {
     id: 'node-3',
-    type: 'tts-node',
+    type: 'end-node',
     position: { x: 300, y: 400 },
     data: {
-      label: '超拟人音频合成',
-      nodeType: 'tts-node',
-      config: { voice: 'default', speed: 1.0 },
-    },
-  },
-  {
-    id: 'node-4',
-    type: 'end-node',
-    position: { x: 300, y: 580 },
-    data: { 
-      label: '结束', 
-      nodeType: 'end-node', 
+      label: '结束',
+      nodeType: 'end-node',
       config: {
         outputParams: [
           {
             name: 'podcast_content',
             type: 'reference',
             value: '',
-            referenceNodeId: 'node-2',
-            referenceOutputKey: 'output'
-          },
-          {
-            name: 'audio_file',
-            type: 'reference',
-            value: '',
-            referenceNodeId: 'node-3',
-            referenceOutputKey: 'audio_url'
+            referenceNodeId: 'node-2'
           }
         ],
-        responseTemplate: '播客内容：{{podcast_content}}\n\n音频文件：{{audio_file}}'
-      } 
+        responseTemplate: '播客内容：{{podcast_content}}'
+      }
     },
   },
 ];
@@ -66,5 +48,4 @@ export const defaultNodes: Node<WorkflowNodeData>[] = [
 export const defaultEdges: Edge[] = [
   { id: 'e1-2', source: 'node-1', target: 'node-2', animated: true },
   { id: 'e2-3', source: 'node-2', target: 'node-3', animated: true },
-  { id: 'e3-4', source: 'node-3', target: 'node-4', animated: true },
 ];
