@@ -119,7 +119,7 @@ export default function ExecutionTimeline({ nodeStatuses, nodeOrder }: Execution
               {status?.status === 'running' && (
                 <div style={{ fontSize: 11, color: '#3b82f6', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span style={{ animation: 'spin 1s linear infinite' }}>⏳</span>
-                  执行中...
+                  {status.error || '执行中...'}
                 </div>
               )}
               

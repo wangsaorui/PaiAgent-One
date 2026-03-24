@@ -16,5 +16,6 @@ public class ExecutionEventDTO {
     private String status;
     private Object output;
     private String error;
+    private String message;
     private long timestamp;
 }

@@ -24,6 +24,19 @@ export function useSSE() {
               });
             }
             break;
+          case 'NODE_PROGRESS':
+            if (data.nodeId && data.nodeType) {
+              // Update progress message in node status
+              updateNodeStatus(data.nodeId, data.nodeType, 'running', undefined, undefined, data.message);
+              if (data.message) {
+                addLog({
+                  type: 'info',
+                  message: data.message,
+                  nodeId: data.nodeId,
+                });
+              }
+            }
+            break;
           case 'NODE_COMPLETED':
             if (data.nodeId && data.nodeType) {
               updateNodeStatus(data.nodeId, data.nodeType, 'completed', data.output, data.input);
