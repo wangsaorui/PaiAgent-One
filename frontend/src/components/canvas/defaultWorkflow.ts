@@ -10,16 +10,17 @@ export const defaultNodes: Node<WorkflowNodeData>[] = [
   },
   {
     id: 'node-2',
-    type: 'llm-node',
+    type: 'tts-node',
     position: { x: 300, y: 200 },
     data: {
-      label: '大模型',
-      nodeType: 'llm-node',
+      label: '超拟人音频合成',
+      nodeType: 'tts-node',
       config: {
-        provider: 'openai',
-        model: 'gpt-4o',
-        systemPrompt: '你是一个专业的播客主持人，请将用户输入的主题扩展为一段生动有趣的播客文稿。',
-        temperature: 0.7,
+        apiKey: '',
+        model: 'qwen3-tts-flash',
+        textParam: { name: 'text', type: 'reference', value: '', referenceNodeId: 'node-1', referenceOutputKey: 'user_input' },
+        voice: 'Cherry',
+        languageType: 'Auto',
       },
     },
   },
@@ -33,13 +34,13 @@ export const defaultNodes: Node<WorkflowNodeData>[] = [
       config: {
         outputParams: [
           {
-            name: 'podcast_content',
+            name: 'voice_url',
             type: 'reference',
             value: '',
             referenceNodeId: 'node-2'
           }
         ],
-        responseTemplate: '播客内容：{{podcast_content}}'
+        responseTemplate: '音频文件：{{voice_url}}'
       }
     },
   },

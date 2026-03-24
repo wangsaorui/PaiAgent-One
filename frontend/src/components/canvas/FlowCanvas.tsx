@@ -5,6 +5,7 @@ import {
   Controls,
   MiniMap,
   type Node,
+  type Edge,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -13,13 +14,30 @@ import { useWorkflowStore } from '../../store/workflowStore';
 import type { WorkflowNodeData } from '../../types/workflow';
 
 const nodeDefaults: Record<string, { label: string; config: Record<string, unknown> }> = {
+  'user-input': {
+    label: '用户输入',
+    config: {},
+  },
   'llm-node': {
     label: '大模型',
     config: { provider: 'openai', model: 'gpt-4o', systemPrompt: '', temperature: 0.7 },
   },
   'tts-node': {
     label: '超拟人音频合成',
-    config: { voice: 'default', speed: 1.0 },
+    config: {
+      apiKey: '',
+      model: 'qwen3-tts-flash',
+      textParam: { name: 'text', type: 'reference', value: '', referenceNodeId: '', referenceOutputKey: '' },
+      voice: 'Cherry',
+      languageType: 'Auto',
+    },
+  },
+  'end-node': {
+    label: '结束',
+    config: {
+      outputParams: [],
+      responseTemplate: ''
+    },
   },
 };
 
@@ -27,7 +45,7 @@ let nodeIdCounter = 100;
 
 export default function FlowCanvas() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, setSelectedNodeId } =
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode, deleteNode, deleteEdge, setSelectedNodeId } =
     useWorkflowStore();
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -77,6 +95,14 @@ export default function FlowCanvas() {
     setSelectedNodeId(null);
   }, [setSelectedNodeId]);
 
+  const onEdgeClick = useCallback((_: React.MouseEvent, edge: Edge) => {
+    deleteEdge(edge.id);
+  }, [deleteEdge]);
+
+  const onNodeDoubleClick = useCallback((_: React.MouseEvent, node: Node) => {
+    deleteNode(node.id);
+  }, [deleteNode]);
+
   return (
     <div ref={reactFlowWrapper} style={{ flex: 1, height: '100%' }}>
       <ReactFlow
@@ -88,7 +114,9 @@ export default function FlowCanvas() {
         onDrop={onDrop}
         onDragOver={onDragOver}
         onNodeClick={onNodeClick}
+        onNodeDoubleClick={onNodeDoubleClick}
         onPaneClick={onPaneClick}
+        onEdgeClick={onEdgeClick}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.3 }}

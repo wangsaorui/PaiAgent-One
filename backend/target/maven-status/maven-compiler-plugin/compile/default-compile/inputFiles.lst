@@ -1,5 +1,7 @@
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\service\WorkflowService.java
+F:\PaiAgent-One\backend\src\main\java\com\paiagent\config\MinioConfig.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\controller\ExecutionController.java
+F:\PaiAgent-One\backend\src\main\java\com\paiagent\service\impl\AliyunTTSServiceImpl.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\engine\ExecutionContext.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\model\workflow\NodeDefinition.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\engine\executors\LLMNodeExecutor.java
@@ -20,6 +22,7 @@ F:\PaiAgent-One\backend\src\main\java\com\paiagent\model\workflow\EdgeDefinition
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\model\dto\ExecutionRequestDTO.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\repository\WorkflowRepository.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\config\WebConfig.java
+F:\PaiAgent-One\backend\src\main\java\com\paiagent\controller\AudioController.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\engine\ExecutionEventEmitter.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\repository\ExecutionRecordRepository.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\model\dto\ExecutionEventDTO.java
@@ -28,3 +31,4 @@ F:\PaiAgent-One\backend\src\main\java\com\paiagent\model\workflow\WorkflowDefini
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\engine\executors\EndNodeExecutor.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\config\AsyncConfig.java
 F:\PaiAgent-One\backend\src\main\java\com\paiagent\service\LLMService.java
+F:\PaiAgent-One\backend\src\main\java\com\paiagent\service\MinioService.java

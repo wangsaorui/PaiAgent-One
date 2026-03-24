@@ -274,7 +274,19 @@ export default function DebugDrawer() {
                 </div>
               )}
 
-              {audioUrl && <AudioPlayer audioUrl={audioUrl} />}
+              {audioUrl && (
+                <div>
+                  <div style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: 8,
+                  }}>
+                    最终输出
+                  </div>
+                  <AudioPlayer audioUrl={audioUrl} />
+                </div>
+              )}
             </div>
           )}
 

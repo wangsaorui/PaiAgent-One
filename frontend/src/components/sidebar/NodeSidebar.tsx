@@ -1,5 +1,6 @@
 import NodePaletteItem from './NodePaletteItem';
 import LLMConfigPanel from '../panels/LLMConfigPanel';
+import TTSConfigPanel from '../panels/TTSConfigPanel';
 import UserInputConfigPanel from '../panels/UserInputConfigPanel';
 import EndNodeConfigPanel from '../panels/EndNodeConfigPanel';
 import { useWorkflowStore } from '../../store/workflowStore';
@@ -9,6 +10,7 @@ export default function NodeSidebar() {
   const nodes = useWorkflowStore((s) => s.nodes);
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const showLLMConfig = selectedNode?.type === 'llm-node';
+  const showTTSConfig = selectedNode?.type === 'tts-node';
   const showUserInputConfig = selectedNode?.type === 'user-input';
   const showEndNodeConfig = selectedNode?.type === 'end-node';
 
@@ -28,6 +30,7 @@ export default function NodeSidebar() {
         节点面板
       </div>
       <div style={{ padding: '0 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <NodePaletteItem nodeType="user-input" label="用户输入" icon="&#128172;" color="#3b82f6" />
         <NodePaletteItem nodeType="llm-node" label="大模型" icon="&#129302;" color="#8b5cf6" />
         <NodePaletteItem
           nodeType="tts-node"
@@ -35,6 +38,7 @@ export default function NodeSidebar() {
           icon="&#127908;"
           color="#f59e0b"
         />
+        <NodePaletteItem nodeType="end-node" label="结束" icon="&#127919;" color="#10b981" />
       </div>
       
       {/* 配置面板区域 - 添加滚动功能 */}
@@ -47,6 +51,7 @@ export default function NodeSidebar() {
         }}
       >
         {showLLMConfig && <LLMConfigPanel />}
+        {showTTSConfig && <TTSConfigPanel />}
         {showUserInputConfig && <UserInputConfigPanel />}
         {showEndNodeConfig && <EndNodeConfigPanel />}
       </div>
